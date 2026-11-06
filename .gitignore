@@ -1,0 +1,19 @@
+# 环境与密钥
+.env
+.env.*
+!.env.example
+
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+*.egg-info/
+
+# Node
+node_modules/
+dist/
+
+# 日志与杂项
+*.log
+.DS_Store
+Thumbs.db
