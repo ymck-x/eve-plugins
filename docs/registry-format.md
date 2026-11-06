@@ -15,16 +15,16 @@
 
 | 字段 | 类型 | 必填 | 说明 |
 |---|---|---|---|
-| `id` | string | 是 | 全库唯一，kebab-case；官方包与目录名一致 |
+| `id` | string | 是 | 全库唯一，kebab-case；官方包与 `eve-plugin-<id>` 目录名一致 |
 | `name` | string | 是 | 显示名（能力目录里给人看的那一行） |
 | `description` | string | 是 | 一句话「什么时候用」；进能力目录，不长讲 |
 | `version` | string | 是 | semver（`0.1.0`） |
 | `eve_api` | string | 是 | 兼容的 EVE 插件 API 范围（`>=1.0 <2.0`） |
 | `kind` | string | 是 | `tool` / `service` / `event` |
 | `repo` | string | 二选一 | `owner/name` |
-| `path` | string | 否 | 单仓多包时的子目录（`plugins/<id>`） |
+| `path` | string | 否 | 单仓多包时的子目录（`plugins/eve-plugin-<id>`） |
 | `npm` | string | 二选一 | npm 包名 |
-| `entry` | string | 是 | 入口（Python 模块 / 子进程命令） |
+| `entry` | string | 是 | 入口 Python 模块（如 `eve_plugin_lookup`） |
 | `permissions` | array | 是 | 权限清单，只写实际用到的 |
 | `risk` | string | 是 | `low` / `medium` / `high` |
 | `verified` | boolean | 是 | 是否通过「包 + 版本」级抽检 |
@@ -33,12 +33,13 @@
 
 ## 规则
 
-1. `id` 全库唯一、kebab-case、不含空格；官方包的 `id` 与 `plugins/<id>/` 目录名一致。
+1. `id` 全库唯一、kebab-case、不含空格；官方包的 `id` 与 `plugins/eve-plugin-<id>/` 目录名一致。
 2. `repo` 和 `npm` 至少有一个。官方包用 `repo` + `path`（同一个仓库放多个包）。
 3. `verified` 只有人工抽检通过才为 `true`；`verified_version` 必须等于当前 `version`，否则一律按未验证。
-4. `permissions` 只写实际用到的；多要一项就是权限单撒谎，拒收。权限组写法的精确枚举在第一批包落地时定稿。
-5. `eve_api` 必须是合法 semver 范围，且与插件 manifest 里的 `eve_api` 一致。
-6. 删除条目 = 从库里撤下；已安装的用户不受影响，但必须能随时关、随时卸。
+4. `permissions` 只写实际用到的；多要一项就是权限单撒谎，拒收。合法词表见 [plugin-format.md](plugin-format.md)。
+5. `eve_api` 必须是合法 semver 范围，且与插件 `eve-plugin.yaml` 里的 `eve_api` 一致。
+6. `default`（出厂默认开关）只写在 manifest 里，索引不重复声明。
+7. 删除条目 = 从库里撤下；已安装的用户不受影响，但必须能随时关、随时卸。
 
 ## 示例
 
@@ -56,8 +57,8 @@
       "eve_api": ">=1.0 <2.0",
       "kind": "tool",
       "repo": "ymck-x/eve-plugins",
-      "path": "plugins/lookup",
-      "entry": "packages.lookup",
+      "path": "plugins/eve-plugin-lookup",
+      "entry": "eve_plugin_lookup",
       "permissions": ["network:https", "data:knowledge"],
       "risk": "medium",
       "verified": true,

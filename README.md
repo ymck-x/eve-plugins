@@ -1,14 +1,14 @@
 # EVE 官方插件库
 
 > 这里放两样东西：机器可读的插件索引 `registry.json`，以及官方插件包源码 `plugins/`。
-> 插件契约（manifest / 权限 / 信任分级 / 安装流程）以 EVE 主仓的插件设计稿为准；本仓库 `docs/` 是面向贡献者的公开口径。
+> 插件契约（包结构 / 权限 / 信任分级 / 安装流程）以 EVE 主仓的插件设计稿为准；本仓库 `docs/` 是面向贡献者的公开口径。
 
 ## 这是什么
 
 EVE 默认是一个完整的人：人格、声音、记忆、身体、感官都在本体里。能力则是一柜子可插拔的包。这个仓库是这些包的**官方来源**：
 
 - **官方插件库**：EVE 先读根目录的 `registry.json` 找官方能力；离线时用本地缓存。
-- **官方插件包**：`plugins/<id>/`，一个包一个目录，带 manifest、入口、测试。
+- **官方插件包**：`plugins/eve-plugin-<id>/`，一个包一个目录，带 `eve-plugin.yaml`、入口、离线测试。
 - **第三方 / 用户插件不进这个仓库**：给 GitHub URL 或 npm 包名直接装，默认按「未验证」处理；想进官方库，走 PR（见 [CONTRIBUTING.md](CONTRIBUTING.md)）。
 
 ## 仓库结构
@@ -16,9 +16,9 @@ EVE 默认是一个完整的人：人格、声音、记忆、身体、感官都�
 ```
 registry.json            # 机器可读索引，EVE 读这个
 docs/registry-format.md  # 索引条目字段与规则
-docs/manifest-format.md  # 插件 manifest 字段与规则
+docs/plugin-format.md    # 插件包结构、七个入口名、eve-plugin.yaml、check 清单
 CONTRIBUTING.md          # 怎么提交、审什么
-plugins/                 # 官方插件包源码，一个包一个目录
+plugins/                 # 官方插件包源码，plugins/eve-plugin-<id>/
 ```
 
 ## registry.json
@@ -43,8 +43,8 @@ plugins/                 # 官方插件包源码，一个包一个目录
   "eve_api": ">=1.0 <2.0",
   "kind": "tool",
   "repo": "ymck-x/eve-plugins",
-  "path": "plugins/lookup",
-  "entry": "packages.lookup",
+  "path": "plugins/eve-plugin-lookup",
+  "entry": "eve_plugin_lookup",
   "permissions": ["network:https", "data:knowledge"],
   "risk": "medium",
   "verified": false,
@@ -53,7 +53,31 @@ plugins/                 # 官方插件包源码，一个包一个目录
 }
 ```
 
-字段、类型、必填项见 [docs/registry-format.md](docs/registry-format.md)；插件的 manifest 见 [docs/manifest-format.md](docs/manifest-format.md)。
+字段、类型、必填项见 [docs/registry-format.md](docs/registry-format.md)。
+
+## 插件怎么写
+
+三种来源（官方 / EVE 自己写 / 用户写）用同一套结构，只改信任档与审核。一个包长这样：
+
+```
+eve-plugin-<id>/
+  pyproject.toml          # Python 包：名、版本、依赖、入口
+  eve-plugin.yaml         # manifest：安装器唯一读的
+  eve_plugin_<id>/
+    __init__.py           # NAME / INJECT / OPTIONAL_INJECT / CONFIG / PERMISSIONS / apply / dispose
+    tools.py              # define_tool(...)
+    contract.py           # 结果 schema / 错误码
+  tests/                  # 离线测试
+  README.md               # 什么时候用 / 权限 / 数据 / 例子
+```
+
+三条铁律：
+
+1. **入口只导出七个名字**；不搞魔法默认导出。
+2. **`apply` 只注册，`dispose` 必清理**；import 零副作用、零阻塞。
+3. **权限先声明，核心才放行**；插件不能自己给自己加权限。
+
+本仓库的多包布局是 `plugins/eve-plugin-<id>/`。完整字段、`eve-plugin.yaml` 写法、`eve plugin check` 14 项见 [docs/plugin-format.md](docs/plugin-format.md)。
 
 ## 官方能力包（13 个）
 
