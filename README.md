@@ -17,6 +17,7 @@ EVE 默认是一个完整的人：人格、声音、记忆、身体、感官都�
 registry.json            # 机器可读索引，EVE 读这个
 docs/registry-format.md  # 索引条目字段与规则
 docs/plugin-format.md    # 插件包结构、七个入口名、eve-plugin.yaml、check 清单
+docs/ai-authoring.md     # 让 DeepSeek / ChatGPT 等外部 AI 写插件的复制提示词
 CONTRIBUTING.md          # 怎么提交、审什么
 plugins/                 # 官方插件包源码，plugins/eve-plugin-<id>/
 ```
