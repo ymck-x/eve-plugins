@@ -1,0 +1,8 @@
+{
+  "name": "eve-plugin-echonode",
+  "version": "0.1.0",
+  "description": "零依赖 MCP 示例插件：原样回显一段文字",
+  "type": "module",
+  "main": "server.js",
+  "license": "MIT"
+}

@@ -20,6 +20,22 @@
       "verified": false,
       "verified_version": "",
       "signature": ""
+    },
+    {
+      "id": "echonode",
+      "name": "回显（Node 示例）",
+      "description": "零依赖 MCP 示例插件：原样回显一段文字",
+      "version": "0.1.0",
+      "eve_api": ">=1.0 <2.0",
+      "kind": "tool",
+      "repo": "ymck-x/eve-plugins",
+      "path": "plugins/eve-plugin-echonode",
+      "entry": "",
+      "permissions": [],
+      "risk": "low",
+      "verified": false,
+      "verified_version": "",
+      "signature": ""
     }
   ]
 }

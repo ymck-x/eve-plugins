@@ -79,7 +79,7 @@ eve-plugin-<id>/
 
 本仓库的多包布局是 `plugins/eve-plugin-<id>/`。完整字段、`eve-plugin.yaml` 写法、`eve plugin check` 14 项见 [docs/plugin-format.md](docs/plugin-format.md)。
 
-## 官方能力包（13 个）
+## 官方能力包（10 个）
 
 出厂预设，随 EVE 发布，默认开（个别默认关），用户可随时关：
 

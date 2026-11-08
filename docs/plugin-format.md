@@ -24,7 +24,7 @@ eve-plugin-<id>/
 
 ```python
 NAME = "lookup"
-INJECT = ("tools", "audit", "clock")        # 硬依赖：不在就不启动
+INJECT = ("tools", "audit")                 # 硬依赖：不在就不启动
 OPTIONAL_INJECT = ("memory",)               # 有就用，没有也能跑
 PERMISSIONS = ("network:https", "data:knowledge")
 CONFIG = LookupConfig(max_results=5, backends=("bingrss", "ddgs", "360"))
@@ -50,12 +50,14 @@ def dispose(ctx):
 | `version` | 是 | semver；与包版本一致 |
 | `eve_api` | 是 | 兼容范围，如 `>=1.0 <2.0` |
 | `kind` | 是 | `tool` / `service` / `event` |
-| `entry` | 是 | Python 模块路径（如 `eve_plugin_lookup`） |
+| `entry` | Python 是；子进程否 | Python：入口文件或模块（如 `plugin.py` / `eve_plugin_lookup`） |
+| `runtime` | 否 | `python`（默认）/ `jsonrpc` / `mcp` |
+| `command` / `args` | 子进程是 | 启动命令（如 `["node", "server.js"]`） |
 | `permissions` | 是（可为空） | 只能用核心词表；未知 → 拒收 |
 | `risk` | 是 | `low` / `medium` / `high` |
-| `budget` | 是 | 每分钟 / 每轮 / 每天上限 |
+| `budget` | 是（可为空 `{}`） | 只认 `per_turn` / `per_minute` / `per_day` |
 | `default` | 是 | `true` / `false`（出厂预设） |
-| `data_dir` | 是 | 相对路径；不许绝对路径 / `..` |
+| `data_version` | 是 | 数据版本（默认 1；升高时迁移） |
 | `signature` | 否 | 官方 / 已验证必填 |
 
 例子：
@@ -65,21 +67,43 @@ id: lookup
 name: 查
 version: 0.1.0
 eve_api: ">=1.0 <2.0"
-kind: tool
+kind: [tool]
 entry: eve_plugin_lookup
 permissions:
   - network:https
   - data:knowledge
 risk: medium
 budget:
-  calls_per_minute: 6
-  calls_per_turn: 2
-  results_per_call: 5
+  per_minute: 6
+  per_turn: 2
 default: true
-data_dir: knowledge
 signature: ""
 ```
 
+## Node / MCP 插件（不用 Python）
+
+同一个清单，换成 `runtime` + `command`，包就是普通的 Node 工程：
+
+```yaml
+id: echo-node
+name: 回显
+version: 0.1.0
+eve_api: ">=1.0 <2.0"
+kind: [tool]
+runtime: mcp
+command: ["node", "server.js"]
+args: []
+permissions: []
+risk: low
+budget: {}
+default: false
+data_version: 1
+```
+
+- `server.js` 按 MCP stdio 协议实现 `initialize` / `tools/list` / `tools/call`（一行一个 JSON-RPC）；
+- 不需要 `entry`，也不需要 `pyproject.toml`；
+- `eve plugin check` 对子进程 runtime 的 Python 专属项（import/apply/工具 schema/dispose）改由**安装事务的真协议测试**覆盖；安装时 EVE 会真起进程、列工具、调一次，再问你要不要装；
+- 依赖：EVE 不跑 `npm install`，包要么零依赖，要么自己把依赖打进去。
 ## 配置
 
 - `CONFIG` 是 schema；必填无默认 → **加载时失败**。
@@ -100,7 +124,7 @@ signature: ""
 
 - manifest 声明；核心在 API 边界拦；未声明 → 运行时拒收。
 - 高危（钱 / 消息 / 摄像头 / 麦克风 / 数据根外文件 / 执行命令）必须走 `ctx.approvals`；插件不能自己给自己加权限。
-- 只写自己的 `data_dir`；人的数据（身份 / 关系 / 偏好 / 日程 / 账本）走核心 API，不直接翻文件。
+- 只写自己的 `<data_root>/plugins/<id>/`（`ctx.data.dir()`；`data_dir` 字段已废止，写了也忽略）；人的数据（身份 / 关系 / 偏好 / 日程 / 账本）走核心 API，不直接翻文件。
 - 数据可导出、可删除；卸载时按用户选择保留 / 删除。
 - 审计 / 日志不含用户原文、密钥、整页正文。
 
@@ -112,14 +136,14 @@ signature: ""
 ### `eve plugin check` 14 项
 
 1. manifest 字段齐全、`eve_api` 合法、版本一致。
-2. 包能 import，七个入口名字都在。
-3. `INJECT` / `OPTIONAL_INJECT` 的服务在当前运行时存在。
+2. Python 包能 import，七个入口名字都在；子进程 runtime 的入口/工具由安装事务的真协议测试覆盖。
+3. Python：`INJECT` / `OPTIONAL_INJECT` 的服务在当前运行时存在。
 4. `CONFIG` 能校验；必填缺失 → 加载失败；默认值生效。
 5. `apply` 幂等；不阻塞；import 无副作用。
-6. 每个工具都有 name / description / parameters / output / execute。
+6. Python：每个工具都有 name / description / parameters / output / execute；子进程：协议 `tools/list` 必须返回工具。
 7. 参数、输出 schema、错误码都符合契约。
-8. `apply → dispose → apply` 能跑通，无残留。
-9. `dispose` 清掉工具 / 事件 / 进程 / 连接。
+8. Python：`apply → dispose → apply` 能跑通，无残留；子进程：安装事务会重启/关闭进程验证无残留。
+9. Python：`dispose` 清掉工具 / 事件 / 进程 / 连接；子进程：关闭走协议 `shutdown`，超时杀树。
 10. 权限声明齐全；静态扫描 + 运行时拒收未声明；审计无密钥。
 11. 测试离线全绿，且不调真实 API、不碰真实数据。
 12. 能安装、启用、关闭、卸载；数据保留策略正确。

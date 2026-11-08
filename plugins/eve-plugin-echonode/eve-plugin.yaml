@@ -1,0 +1,14 @@
+id: echonode
+name: 回显（Node 示例）
+description: 零依赖的 MCP 示例插件：把一段文字原样回显，演示用 Node 写 EVE 插件。
+version: 0.1.0
+eve_api: ">=1.0 <2.0"
+kind: [tool]
+runtime: mcp
+command: ["node", "server.js"]
+args: []
+permissions: []
+risk: low
+budget: {}
+default: false
+data_version: 1
