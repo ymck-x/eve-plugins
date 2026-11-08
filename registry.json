@@ -1,6 +1,25 @@
 {
   "schema": 1,
   "name": "EVE 官方插件库",
-  "updated": "2026-11-06",
-  "plugins": []
+  "updated": "2026-11-08",
+  "plugins": [
+    {
+      "id": "wordcount",
+      "name": "字数",
+      "description": "数一段文字的字数、中文字数、英文词数，并记累计统计",
+      "version": "0.1.0",
+      "eve_api": ">=1.0 <2.0",
+      "kind": "tool",
+      "repo": "ymck-x/eve-plugins",
+      "path": "plugins/eve-plugin-wordcount",
+      "entry": "eve_plugin_wordcount",
+      "permissions": [
+        "data:wordcount"
+      ],
+      "risk": "low",
+      "verified": false,
+      "verified_version": "",
+      "signature": ""
+    }
+  ]
 }

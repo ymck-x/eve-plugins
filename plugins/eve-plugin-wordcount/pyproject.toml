@@ -1,0 +1,6 @@
+[project]
+name = "eve-plugin-wordcount"
+version = "0.1.0"
+description = "EVE 官方插件：字数统计"
+requires-python = ">=3.10"
+dependencies = []

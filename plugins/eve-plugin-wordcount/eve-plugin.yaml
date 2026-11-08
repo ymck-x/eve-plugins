@@ -1,0 +1,14 @@
+id: wordcount
+name: 字数
+description: 数一段文字的字数、中文字数、英文词数，并记累计统计。
+version: 0.1.0
+eve_api: ">=1.0 <2.0"
+kind: [tool]
+entry: eve_plugin_wordcount
+permissions:
+  - data:wordcount
+risk: low
+budget:
+  per_turn: 20
+default: false
+data_version: 1
