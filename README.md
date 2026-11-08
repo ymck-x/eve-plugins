@@ -9,6 +9,7 @@
   `python scripts\plugin_check.py <目录>`，再对 EVE 说「装这个插件 <目录>」。
 - **让 EVE 写**：直接说「帮我写个插件：……」，她生成、检查、装；你只答信任和权限。
 - **装现成的 MCP**：直接说「装 @modelcontextprotocol/server-memory」；没有 `eve-plugin.yaml` 也行，EVE 会按 `package.json` 自动生成清单、只装依赖、测协议。
+- **拖进来**：把插件打成一个 `.zip` 拖到聊天输入框，发一句「装这个插件」；EVE 解包、检查、问权限。
 
 不管谁写，装的时候都要你点头；EVE 不替你做这个决定。
 ## 这是什么
