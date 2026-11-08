@@ -16,7 +16,7 @@ eve-plugin-<id>/
   README.md               # 什么时候用 / 权限 / 数据 / 例子
 ```
 
-- `eve-plugin.yaml` 与 `pyproject.toml` 的版本必须一致（`eve plugin check` 校验）。
+- `eve-plugin.yaml` 与 `pyproject.toml` 的版本必须一致（`python scripts\plugin_check.py` 校验）。
 - 测试必须能离线跑；不调真实 API、不写真实数据。
 - 本仓库的多包布局：`plugins/eve-plugin-<id>/`。
 
@@ -102,7 +102,7 @@ data_version: 1
 
 - `server.js` 按 MCP stdio 协议实现 `initialize` / `tools/list` / `tools/call`（一行一个 JSON-RPC）；
 - 不需要 `entry`，也不需要 `pyproject.toml`；
-- `eve plugin check` 对子进程 runtime 的 Python 专属项（import/apply/工具 schema/dispose）改由**安装事务的真协议测试**覆盖；安装时 EVE 会真起进程、列工具、调一次，再问你要不要装；
+- `plugin_check` 对子进程 runtime 的 Python 专属项（import/apply/工具 schema/dispose）改由**安装事务的真协议测试**覆盖；安装时 EVE 会真起进程、列工具、调一次，再问你要不要装；
 - 依赖：EVE 不跑 `npm install`，包要么零依赖，要么自己把依赖打进去。
 ## 配置
 
@@ -131,9 +131,9 @@ data_version: 1
 ## 测试
 
 - 单元测试 + 契约测试；假服务、假后端；不调真实 API / 网络 / 数据。
-- `eve plugin check <path>` 必须全绿才允许安装；官方 / EVE / 用户同一把尺。
+- `python scripts\plugin_check.py <path>`（在 EVE 仓库根目录）必须全绿才允许安装；官方 / EVE / 用户同一把尺。
 
-### `eve plugin check` 14 项
+### `plugin_check` 14 项
 
 1. manifest 字段齐全、`eve_api` 合法、版本一致。
 2. Python 包能 import，七个入口名字都在；子进程 runtime 的入口/工具由安装事务的真协议测试覆盖。

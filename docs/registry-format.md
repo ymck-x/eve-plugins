@@ -24,7 +24,7 @@
 | `repo` | string | 二选一 | `owner/name` |
 | `path` | string | 否 | 单仓多包时的子目录（`plugins/eve-plugin-<id>`） |
 | `npm` | string | 二选一 | npm 包名 |
-| `entry` | string | 是 | 入口 Python 模块（如 `eve_plugin_lookup`） |
+| `entry` | string | Python 是；子进程可空 | 入口 Python 模块/文件；`runtime` 为 jsonrpc/mcp 时不需要 |
 | `permissions` | array | 是 | 权限清单，只写实际用到的 |
 | `risk` | string | 是 | `low` / `medium` / `high` |
 | `verified` | boolean | 是 | 是否通过「包 + 版本」级抽检 |
