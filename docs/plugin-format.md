@@ -104,6 +104,14 @@ data_version: 1
 - 不需要 `entry`，也不需要 `pyproject.toml`；
 - `plugin_check` 对子进程 runtime 的 Python 专属项（import/apply/工具 schema/dispose）改由**安装事务的真协议测试**覆盖；安装时 EVE 会真起进程、列工具、调一次，再问你要不要装；
 - 依赖：EVE 不跑 `npm install`，包要么零依赖，要么自己把依赖打进去。
+## 现成的 npm MCP 包（没有清单也能装）
+
+普通 MCP 包（例如 `@modelcontextprotocol/server-memory`）不需要作者写 `eve-plugin.yaml`：
+
+- 只要 `package.json` 有 `bin` / `main`，EVE 按包名自动生成清单：`runtime: mcp`、`command: ["node", <bin>]`；
+- 依赖由 EVE 在**用户信任后**用自带 npm 装：`install/ci --omit=dev --ignore-scripts`（不跑安装脚本，240s 超时、500MB 上限）；
+- 装完先起真 MCP 协议测试（`initialize` → `tools/list`），再问权限；不是 MCP 的普通 npm 库会在这一步失败；
+- 自动清单默认声明 `network:https`（MCP 服务多半要联网），用户可以在权限单里拒掉。
 ## 配置
 
 - `CONFIG` 是 schema；必填无默认 → **加载时失败**。
