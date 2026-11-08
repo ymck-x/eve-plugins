@@ -1,0 +1,12 @@
+id: hello
+name: 你好
+description: 最小插件模板：说一句话，返回一句问候。
+version: 0.1.0
+eve_api: ">=1.0 <2.0"
+kind: [tool]
+entry: plugin.py
+permissions: []
+risk: low
+budget: {}
+default: false
+data_version: 1
